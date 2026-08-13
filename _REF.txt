@@ -1,0 +1,16 @@
+000	I	
+001	S	
+010	B	
+011	U	
+100	J
+
+0000	ADD	A + B
+0001	SUB	A − B
+0010	AND	Bitwise AND
+0011	OR	Bitwise OR
+0100	XOR	Bitwise XOR
+0101	SLL	Shift A left by B
+0110	SRL	Shift A right logically
+0111	SRA	Shift A right arithmetically
+1000	SLT	1 if A < B, signed
+1001	SLTU

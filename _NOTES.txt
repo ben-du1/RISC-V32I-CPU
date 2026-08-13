@@ -1,0 +1,3 @@
+- Learned difference between GAS syntax and RISC-V ISA
+- Fixed infinite writing loop in register_file
+- Had to force cast A to signed in Alu to allow SRAI to work
