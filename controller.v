@@ -26,6 +26,7 @@ module controller(
     output reg alu_out_write,
     output reg mdr_write,
     output reg reg_write,
+    output reg instruction_read,
     output reg mem_read,
     output reg mem_write,
     output reg alu_src_imm,
@@ -43,25 +44,26 @@ localparam OP_JALR = 7'b1100111;
 localparam OP_LUI = 7'b0110111;
 localparam OP_AUIPC = 7'b0010111;
 
-localparam FETCH = 4'd0;
-localparam DECODE = 4'd1;
-localparam R_EXECUTE = 4'd2;
-localparam R_WRITEBACK = 4'd3;
-localparam I_EXECUTE = 4'd4;
-localparam I_WRITEBACK = 4'd5;
-localparam MEM_ADDRESS = 4'd6;
-localparam MEM_READ = 4'd7;
-localparam MEM_WRITEBACK = 4'd8;
-localparam MEM_WAIT = 4'd15;
-localparam MEM_WRITE = 4'd9;
-localparam BRANCH = 4'd10;
-localparam JAL = 4'd11;
-localparam JALR = 4'd12;
-localparam LUI = 4'd13;
-localparam AUIPC = 4'd14;
+localparam FETCH = 5'd0;
+localparam FETCH_WAIT = 5'd16;
+localparam DECODE = 5'd1;
+localparam R_EXECUTE = 5'd2;
+localparam R_WRITEBACK = 5'd3;
+localparam I_EXECUTE = 5'd4;
+localparam I_WRITEBACK = 5'd5;
+localparam MEM_ADDRESS = 5'd6;
+localparam MEM_READ = 5'd7;
+localparam MEM_WRITEBACK = 5'd8;
+localparam MEM_WAIT = 5'd15;
+localparam MEM_WRITE = 5'd9;
+localparam BRANCH = 5'd10;
+localparam JAL = 5'd11;
+localparam JALR = 5'd12;
+localparam LUI = 5'd13;
+localparam AUIPC = 5'd14;
 
-reg [3:0] state;
-reg [3:0] next_state;
+reg [4:0] state;
+reg [4:0] next_state;
 
 wire take_branch;
 
@@ -83,6 +85,9 @@ always @(*) begin
     case (state)
 
         FETCH:
+            next_state = FETCH_WAIT;
+
+        FETCH_WAIT:
             next_state = DECODE;
 
         DECODE: begin
@@ -195,16 +200,20 @@ always @(*) begin
     alu_src_imm = 1'b0;
     alu_src_a = 2'b00;
     writeback_src = 3'b000;
+    instruction_read = 1'b0;
 
     case (state)
 
         FETCH: begin
 
+            instruction_read = 1'b1;
+
+        end
+
+        FETCH_WAIT: begin
+
             ir_write = 1'b1;
-
             pc_write = 1'b1;
-
-            // alu_src_a = 2'b00;
 
         end
 

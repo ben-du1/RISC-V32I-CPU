@@ -5,9 +5,12 @@ module data_memory(
     input mem_write,
     input mem_read,
 
+    input instruction_read,
+
     input [2:0] mem_size_bytes,
     input mem_load_signed,
     input [31:0] address,
+    input [31:0] instruction_address,
     input [31:0] write_data,
 
     input uart_rx_read_enable,
@@ -23,6 +26,7 @@ module data_memory(
     output reg uart_tx_start,
 
     output reg [31:0] read_data,
+    output reg [31:0] instruction,
 
     output reg [31:0] timer_count
 );
@@ -33,8 +37,7 @@ reg [31:0] assembled_word;
 
 
 initial begin
-    // $readmemh("_program.hex",memory);
-    $readmemh("_data.hex",memory,32'h400);
+    $readmemh("_boot.hex",memory);
 end
 
 assign uart_rx_read = uart_rx_read_enable && (address == 32'h10000010);
@@ -43,6 +46,8 @@ assign uart_rx_read = uart_rx_read_enable && (address == 32'h10000010);
 always @(posedge clk) begin
     if (mem_read)
         memory_read_data <= memory[address[12:2]];
+    if (instruction_read)
+        instruction <= memory[instruction_address[12:2]];
 end
 
 // data formatting during MEM_WAIT

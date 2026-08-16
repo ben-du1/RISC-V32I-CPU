@@ -18,6 +18,7 @@ wire b_write;
 wire alu_out_write;
 wire mdr_write;
 wire reg_write;
+wire instruction_read;
 wire mem_read;
 wire mem_write;
 
@@ -94,6 +95,8 @@ controller controller_unit (
 
     .reg_write(reg_write),
 
+    .instruction_read(instruction_read),
+
     .mem_read(mem_read),
     .mem_write(mem_write),
 
@@ -167,17 +170,14 @@ datapath datapath_unit (
     .pc(pc)
 );
 
-instruction_memory instruction_memory_unit (
-    .address(pc),
-    .instruction(instruction_memory_data)
-);
-
 data_memory data_memory_unit (
     .clk(clk),
     .reset(reset),
 
     .mem_write(mem_write),
     .mem_read(mem_read),
+    .instruction_read(instruction_read),
+
 
     .address(memory_address),
     .write_data(memory_write_data),
@@ -196,7 +196,10 @@ data_memory data_memory_unit (
     .uart_rx_read_enable(uart_rx_read_enable),
 
     .gpio_in(gpio_in),
-    .gpio_out(gpio_out)
+    .gpio_out(gpio_out),
+
+    .instruction(instruction_memory_data),
+    .instruction_address(pc)
 );
 
 uart uart_unit (
