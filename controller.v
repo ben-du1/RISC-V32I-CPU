@@ -27,7 +27,6 @@ module controller(
     output reg mdr_write,
     output reg reg_write,
     output reg mem_read,
-    output reg mem_format,
     output reg mem_write,
     output reg alu_src_imm,
     output reg [1:0] alu_src_a,
@@ -36,30 +35,30 @@ module controller(
 
 localparam OP_RTYPE = 7'b0110011;
 localparam OP_ITYPE = 7'b0010011;
-localparam OP_LOAD  = 7'b0000011;
+localparam OP_LOAD = 7'b0000011;
 localparam OP_STORE = 7'b0100011;
-localparam OP_BRANCH= 7'b1100011;
-localparam OP_JAL   = 7'b1101111;
-localparam OP_JALR  = 7'b1100111;
-localparam OP_LUI   = 7'b0110111;
+localparam OP_BRANCH = 7'b1100011;
+localparam OP_JAL = 7'b1101111;
+localparam OP_JALR = 7'b1100111;
+localparam OP_LUI = 7'b0110111;
 localparam OP_AUIPC = 7'b0010111;
 
-localparam FETCH       = 4'd0;
-localparam DECODE      = 4'd1;
-localparam R_EXECUTE   = 4'd2;
+localparam FETCH = 4'd0;
+localparam DECODE = 4'd1;
+localparam R_EXECUTE = 4'd2;
 localparam R_WRITEBACK = 4'd3;
-localparam I_EXECUTE   = 4'd4;
+localparam I_EXECUTE = 4'd4;
 localparam I_WRITEBACK = 4'd5;
 localparam MEM_ADDRESS = 4'd6;
-localparam MEM_READ    = 4'd7;
-localparam MEM_WB      = 4'd8;
-localparam MEM_WAIT    = 4'd15;
-localparam MEM_WRITE   = 4'd9;
-localparam BRANCH      = 4'd10;
-localparam JAL         = 4'd11;
-localparam JALR        = 4'd12;
-localparam LUI         = 4'd13;
-localparam AUIPC       = 4'd14;
+localparam MEM_READ = 4'd7;
+localparam MEM_WRITEBACK = 4'd8;
+localparam MEM_WAIT = 4'd15;
+localparam MEM_WRITE = 4'd9;
+localparam BRANCH = 4'd10;
+localparam JAL = 4'd11;
+localparam JALR = 4'd12;
+localparam LUI = 4'd13;
+localparam AUIPC = 4'd14;
 
 reg [3:0] state;
 reg [3:0] next_state;
@@ -138,25 +137,20 @@ always @(*) begin
 
         MEM_ADDRESS: begin
 
-            // if (opcode == OP_LOAD)
-            //     next_state = MEM_READ;
-            // else
-            //     next_state = MEM_WRITE;
             next_state = MEM_READ;
 
         end
 
         MEM_READ:
-            // next_state = MEM_WAIT;
             if (opcode == OP_LOAD)
                 next_state = MEM_WAIT;
             else
                 next_state = MEM_WRITE;
 
         MEM_WAIT:
-            next_state = MEM_WB;
+            next_state = MEM_WRITEBACK;
 
-        MEM_WB:
+        MEM_WRITEBACK:
             next_state = FETCH;
 
         MEM_WRITE:
@@ -186,22 +180,21 @@ end
 always @(*) begin
 
     uart_rx_read_enable = 1'b0;
-    ir_write       = 1'b0;
-    pc_write       = 1'b0;
-    pc_src_branch  = 1'b0;
-    pc_src_jal     = 1'b0;
-    pc_src_jalr    = 1'b0;
-    a_write        = 1'b0;
-    b_write        = 1'b0;
-    alu_out_write  = 1'b0;
-    mdr_write      = 1'b0;
-    reg_write      = 1'b0;
-    mem_format = 1'b0;
-    mem_read       = 1'b0;
-    mem_write      = 1'b0;
-    alu_src_imm    = 1'b0;
-    alu_src_a      = 2'b00;
-    writeback_src  = 3'b000;
+    ir_write = 1'b0;
+    pc_write = 1'b0;
+    pc_src_branch = 1'b0;
+    pc_src_jal = 1'b0;
+    pc_src_jalr = 1'b0;
+    a_write = 1'b0;
+    b_write = 1'b0;
+    alu_out_write = 1'b0;
+    mdr_write = 1'b0;
+    reg_write = 1'b0;
+    mem_read = 1'b0;
+    mem_write = 1'b0;
+    alu_src_imm = 1'b0;
+    alu_src_a = 2'b00;
+    writeback_src = 3'b000;
 
     case (state)
 
@@ -277,12 +270,11 @@ always @(*) begin
 
         MEM_WAIT: begin
 
-            mem_format = 1'b1;
             mdr_write = 1'b1;
 
         end
 
-        MEM_WB: begin
+        MEM_WRITEBACK: begin
 
             reg_write = 1'b1;
 

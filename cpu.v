@@ -1,14 +1,13 @@
 module cpu (
-    input wire clk,
-    input wire reset,
-    input wire rx,
-    input wire gpio_in,
+    input clk,
+    input reset,
+    input rx,
+    input [15:0] gpio_in,
 
-    output wire gpio_out,
-    output wire tx
+    output [15:0] gpio_out,
+    output tx
 );
 
-// control
 wire ir_write;
 wire pc_write;
 wire pc_src_branch;
@@ -20,7 +19,6 @@ wire alu_out_write;
 wire mdr_write;
 wire reg_write;
 wire mem_read;
-wire mem_format;
 wire mem_write;
 
 wire alu_src_imm;
@@ -97,7 +95,6 @@ controller controller_unit (
     .reg_write(reg_write),
 
     .mem_read(mem_read),
-    .mem_format(mem_format),
     .mem_write(mem_write),
 
     .alu_src_imm(alu_src_imm),
@@ -181,7 +178,6 @@ data_memory data_memory_unit (
 
     .mem_write(mem_write),
     .mem_read(mem_read),
-    .mem_format(mem_format),
 
     .address(memory_address),
     .write_data(memory_write_data),

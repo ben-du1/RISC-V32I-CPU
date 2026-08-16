@@ -18,7 +18,7 @@ module datapath (
     input reg_write,
     input [2:0] writeback_src,
     input [31:0] instruction_memory_data,
-    input[31:0] data_memory_data,
+    input [31:0] data_memory_data,
 
     output [31:0] ir_data,
     output [31:0] memory_address,
@@ -70,7 +70,6 @@ assign rd = ir[11:7];
 
 assign ir_data = ir;
 
-
 imm_gen imm_gen_unit (
     .instruction(ir_data),
     .imm_type(imm_type),
@@ -102,11 +101,11 @@ end
 
 always @(posedge clk) begin
     if (reset) begin
-        ir     <= 32'b0;
-        A      <= 32'b0;
-        B      <= 32'b0;
+        ir <= 32'b0;
+        A <= 32'b0;
+        B <= 32'b0;
         alu_out <= 32'b0;
-        mdr    <= 32'b0;
+        mdr <= 32'b0;
         pc_reg <= 32'b0;
         old_pc <= 32'b0;
     end else begin 

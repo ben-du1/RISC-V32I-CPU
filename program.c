@@ -1,10 +1,13 @@
 #define UART_TX (*(volatile unsigned char*)0x10000000)
 #define UART_RX (*(volatile unsigned char*)0x10000010)
 #define UART_STATUS (*(volatile unsigned char*)0x10000014)
-#define GPIO_IN (*(volatile unsigned char*)0x1000001c)
-#define GPIO_OUT (*(volatile unsigned char*)0x10000020)
+#define GPIO_IN (*(volatile unsigned short*)0x1000001c)
+#define GPIO_OUT (*(volatile unsigned short*)0x10000020)
 #define TIMER_COUNT (*(volatile unsigned int*)0x10000024)
 
+int test1 = 1234;
+int test2 = 0xDEADBEEF;
+unsigned char test3 = 0xAB;
 
 void put_char(char c) {
     UART_TX = c;
@@ -25,42 +28,23 @@ void delay(unsigned int cycles)
     }
 }
 
+void gpio_write(int pin, int value)
+{
+    if (value)
+        GPIO_OUT |= (1u << pin);
+    else
+        GPIO_OUT &= ~(1u << pin);
+}
 
+int gpio_read(int pin) { return (GPIO_IN >> pin) & 1; }
 
 void main() {
-    // char message[] = "Hello World";
-
-    // for (int i = 0; i<11; i++) {
-    //     put_char(message[i]);
-    // }
-
-    // if (GPIO_IN) {
-    //     GPIO_OUT =1;
-    // }
-
-    // unsigned int start = TIMER_COUNT;
-    // unsigned int state = 0;
-
-    // GPIO_OUT = 0;
+    int i = 0;
     while (1) {
-        char c = get_char();
-        put_char(c);
-        // GPIO_OUT = 1;
-        // delay(27000000);
-
-        // GPIO_OUT = 0;
-        // delay(27000000);
-
-        // GPIO_OUT = 1;
-        // delay(27000000*2);
-
-        // GPIO_OUT = 0;
-        // delay(27000000*2);
-
-        // GPIO_OUT = 1;
-        // delay(27000000*4);
-
-        // GPIO_OUT = 0;
-        // delay(27000000*4);
+        delay(1);
+        gpio_write(i,1);
+        put_char(gpio_read(4));
+        put_char(test3);
+        i++;
     }
 }

@@ -8,7 +8,7 @@ Write-Host "=== Assembling ==="
     -ffreestanding `
     -nostdlib `
     -nostartfiles `
-    -T link2.ld `
+    -T link.ld `
     start.s program.c `
     -o _program.elf
 
@@ -23,7 +23,7 @@ Write-Host "=== Generating Binaries ==="
 Write-Host "=== Running Python conversions ==="
 
 python convert.py hex _program.bin _program.hex
-python convert.py bin _data.bin _data.bin
+python convert.py hex _data.bin _data.hex
 
 Write-Host "=== Compiling Verilog ==="
 

@@ -4,8 +4,8 @@ reg clk;
 reg reset;
 wire tx;
 reg rx;
-wire gpio_out;
-reg gpio_in;
+wire [15:0] gpio_out;
+reg [15:0] gpio_in;
 
 cpu uut(
     .clk(clk),
@@ -74,7 +74,7 @@ initial begin
     send_uart_byte(8'h41);
     send_uart_byte(8'h67);
 
-    // gpio_in = 1'b1;
+    gpio_in = 16'h1010;
 
     #10000;
 

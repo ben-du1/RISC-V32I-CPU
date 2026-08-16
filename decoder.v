@@ -47,7 +47,6 @@ always @(*) begin
         // register arithmetic
         7'b0110011: begin
 
-            // set alu_src LOW for R-type
             imm_type = 3'b000;
 
 
@@ -104,7 +103,6 @@ always @(*) begin
         // immediate arithmetic
         7'b0010011: begin
 
-            // set alu_src HIGH for i-type
             imm_type = 3'b000;
 
 
@@ -241,10 +239,8 @@ always @(*) begin
         // branch
         7'b1100011: begin
             
-            // alu_src is false because we need to compare rs1 and rs2
             // b-type
             imm_type = 3'b010;
-            // branch = 1'b1;
 
             case (funct3)
                 // BEQ
