@@ -9,6 +9,7 @@ module data_memory(
     input [31:0] address,
     input [31:0] write_data,
 
+    input uart_rx_read_enable,
     input [7:0] uart_rx_data,
     input uart_rx_ready,
     input gpio_in,
@@ -22,110 +23,28 @@ module data_memory(
 
     output reg [31:0] read_data,
 
-    output reg [31:0] timer_count,
-
-    output wire [31:0] debug_0x100,
-    output wire [31:0] debug_0x104,
-    output wire [31:0] debug_0x108,
-    output wire [31:0] debug_0x10C,
-
-    output wire [31:0] debug_0x110,
-    output wire [31:0] debug_0x114,
-    output wire [31:0] debug_0x118,
-    output wire [31:0] debug_0x11C,
-
-    output wire [7:0] debug_0x120,
-    output wire [7:0] debug_0x121,
-
-    output wire [15:0] debug_0x122,
-    output wire [15:0] debug_0x124,
-
-    output wire [31:0] debug_0x128,
-    output wire [31:0] debug_0x12C
+    output reg [31:0] timer_count
 );
 
-reg [7:0] memory [0:8192];
+reg [31:0] memory [0:255];
+reg [31:0] memory_read_data;
 
-
-assign debug_0x100 = {
-    memory[32'h103],
-    memory[32'h102],
-    memory[32'h101],
-    memory[32'h100]
-};
-
-assign debug_0x104 = {
-    memory[32'h107],
-    memory[32'h106],
-    memory[32'h105],
-    memory[32'h104]
-};
-
-assign debug_0x108 = {
-    memory[32'h10B],
-    memory[32'h10A],
-    memory[32'h109],
-    memory[32'h108]
-};
-
-assign debug_0x10C = {
-    memory[32'h10F],
-    memory[32'h10E],
-    memory[32'h10D],
-    memory[32'h10C]
-};
-
-
-assign debug_0x110 = {
-    memory[32'h113],
-    memory[32'h112],
-    memory[32'h111],
-    memory[32'h110]
-};
-
-assign debug_0x114 = {
-    memory[32'h117],
-    memory[32'h116],
-    memory[32'h115],
-    memory[32'h114]
-};
-
-assign debug_0x118 = {
-    memory[32'h11B],
-    memory[32'h11A],
-    memory[32'h119],
-    memory[32'h118]
-};
-
-assign debug_0x11C = {
-    memory[32'h11F],
-    memory[32'h11E],
-    memory[32'h11D],
-    memory[32'h11C]
-};
-
-
-assign debug_0x128 = {
-    memory[32'h12B],
-    memory[32'h12A],
-    memory[32'h129],
-    memory[32'h128]
-};
-
-assign debug_0x12C = {
-    memory[32'h12F],
-    memory[32'h12E],
-    memory[32'h12D],
-    memory[32'h12C]
-};
 
 initial begin
-    $readmemh("_data.bin",memory,32'h1000);
+    $readmemh("_data.bin",memory,32'h80);
 end
 
-assign uart_rx_read = mem_read && (address == 32'h10000010);
+
+assign uart_rx_read = uart_rx_read_enable && (address == 32'h10000010);
+
+always @(posedge clk) begin
+    if (mem_read)
+        memory_read_data <= memory[address[9:2]];
+end
 
 always @(*) begin
+
+
     if (mem_read) begin
         if (address == 32'h10000010) begin
             read_data = {24'b0,uart_rx_data};
@@ -138,13 +57,34 @@ always @(*) begin
         end else begin
             case (mem_size_bytes)
                 3'b100: 
-                    read_data =  {memory[address+3],memory[address+2],memory[address+1],memory[address]};
+                    read_data =  memory_read_data;
 
                 3'b010:
-                    read_data = {{16{mem_load_signed ? memory[address+1][7] : 1'b0}}, memory[address+1], memory[address]};
+                    if (address[1] == 1'b0) begin
+                        read_data = {{16{mem_load_signed ? memory_read_data[15] : 1'b0}},memory_read_data[15:0]};
+                    end else begin
+                        read_data = {{16{mem_load_signed ? memory_read_data[31] : 1'b0}},memory_read_data[31:16]};
+                    end
 
-                3'b001:
-                    read_data = {{24{mem_load_signed ? memory[address][7] : 1'b0}}, memory[address]};
+                3'b001: begin
+                    case (address[1:0])
+                        2'b00:
+                            read_data = {{24{mem_load_signed ? memory_read_data[7]  : 1'b0}},
+                                        memory_read_data[7:0]};
+
+                        2'b01:
+                            read_data = {{24{mem_load_signed ? memory_read_data[15] : 1'b0}},
+                                        memory_read_data[15:8]};
+
+                        2'b10:
+                            read_data = {{24{mem_load_signed ? memory_read_data[23] : 1'b0}},
+                                        memory_read_data[23:16]};
+
+                        2'b11:
+                            read_data = {{24{mem_load_signed ? memory_read_data[31] : 1'b0}},
+                                        memory_read_data[31:24]};
+                    endcase
+                end
 
                 default:
                     read_data = 32'h0;
@@ -154,6 +94,7 @@ always @(*) begin
     end else 
         read_data = 32'h0;
 end
+
 
 always @(posedge clk) begin
 
@@ -173,19 +114,24 @@ always @(posedge clk) begin
         end else begin
             case (mem_size_bytes)
                 3'b100: begin
-                    memory[address] <= write_data[7:0]; 
-                    memory[address + 1] <= write_data[15:8];
-                    memory[address + 2] <= write_data[23:16];
-                    memory[address + 3] <= write_data[31:24];
+                    memory[address[9:2]] <= write_data; 
                 end
 
                 3'b010: begin
-                    memory[address] <= write_data[7:0]; 
-                    memory[address + 1] <= write_data[15:8];
+                    if (address[1:0] == 2'b00) begin
+                        memory[address[9:2]][15:0] <= write_data[15:0];
+                    end else if (address[1:0] == 2'b10) begin
+                        memory[address[9:2]][31:16] <= write_data[15:0];
+                    end
                 end
 
                 3'b001: begin
-                    memory[address] <= write_data[7:0]; 
+                    case (address[1:0])
+                        2'b00: memory[address[9:2]][7:0]   <= write_data[7:0];
+                        2'b01: memory[address[9:2]][15:8]  <= write_data[7:0];
+                        2'b10: memory[address[9:2]][23:16] <= write_data[7:0];
+                        2'b11: memory[address[9:2]][31:24] <= write_data[7:0];
+                    endcase
                 end
             endcase
         end

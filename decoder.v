@@ -1,19 +1,10 @@
 module decoder(
     input [31:0] instruction,
 
-    output [4:0] rs1,
-    output [4:0] rs2,
-    output [4:0] rd,
-
     output reg [3:0] alu_control,
 
-    output reg reg_write,
-    output reg alu_src,
     output reg [2:0] imm_type,
 
-    output reg mem_to_reg,
-    output reg mem_read,
-    output reg mem_write,
     output reg mem_load_signed,
     output reg [2:0] mem_size_bytes,
 
@@ -34,20 +25,12 @@ wire[2:0] funct3;
 wire[6:0] funct7;
 
 assign funct7 = instruction[31:25];
-assign rs2 = instruction[24:20];
-assign rs1 = instruction[19:15];
 assign funct3 = instruction[14:12];
-assign rd = instruction[11:7];
 assign opcode = instruction[6:0];
 
 always @(*) begin
     alu_control = 4'b0000;
-    reg_write = 1'b0;
-    alu_src = 1'b0;
     imm_type = 3'b000;
-    mem_to_reg = 1'b0;
-    mem_read = 1'b0;
-    mem_write = 1'b0;
     mem_load_signed = 1'b0;
     mem_size_bytes = 3'b000;
     branch = 1'b0;
@@ -65,8 +48,6 @@ always @(*) begin
         7'b0110011: begin
 
             // set alu_src LOW for R-type
-            alu_src = 1'b0;
-            reg_write = 1'b1;
             imm_type = 3'b000;
 
 
@@ -83,7 +64,7 @@ always @(*) begin
 
                 // sll
                 3'b001:
-                        alu_control = 4'b0101;
+                    alu_control = 4'b0101;
 
                 // slt
                 3'b010:
@@ -124,8 +105,6 @@ always @(*) begin
         7'b0010011: begin
 
             // set alu_src HIGH for i-type
-            alu_src = 1'b1;
-            reg_write = 1'b1;
             imm_type = 3'b000;
 
 
@@ -178,8 +157,6 @@ always @(*) begin
 
         7'b0000011: begin
 
-            alu_src = 1'b1;
-            reg_write = 1'b1;
             // i-type
             imm_type = 3'b000;
 
@@ -188,8 +165,6 @@ always @(*) begin
 
                 // lb
                 3'b000: begin
-                    mem_to_reg = 1'b1;
-                    mem_read = 1'b1;
                     alu_control = 4'b0000;
                     mem_size_bytes = 3'b001;
                     mem_load_signed = 1'b1;
@@ -197,8 +172,6 @@ always @(*) begin
 
                 // lh
                 3'b001: begin
-                    mem_to_reg = 1'b1;
-                    mem_read = 1'b1;
                     alu_control = 4'b0000;
                     mem_size_bytes = 3'b010;
                     mem_load_signed = 1'b1;
@@ -207,8 +180,6 @@ always @(*) begin
 
                 // lw
                 3'b010: begin
-                    mem_to_reg = 1'b1;
-                    mem_read = 1'b1;
                     alu_control = 4'b0000;
                     mem_size_bytes = 3'b100;
                     mem_load_signed = 1'b1;
@@ -216,8 +187,6 @@ always @(*) begin
                 
                 // lbu
                 3'b100: begin
-                    mem_to_reg = 1'b1;
-                    mem_read = 1'b1;
                     alu_control = 4'b0000;
                     mem_size_bytes = 3'b001;
                     mem_load_signed = 1'b0;
@@ -225,8 +194,6 @@ always @(*) begin
 
                 // lhu
                 3'b101: begin
-                    mem_to_reg = 1'b1;
-                    mem_read = 1'b1;
                     alu_control = 4'b0000;
                     mem_size_bytes = 3'b010;
                     mem_load_signed = 1'b0;
@@ -241,7 +208,6 @@ always @(*) begin
         // immediate stores
         7'b0100011: begin
             
-            alu_src = 1'b1;
             // s-type immediate
             imm_type = 3'b001;
 
@@ -250,24 +216,18 @@ always @(*) begin
 
                 // sw
                 3'b010: begin
-                    mem_write = 1'b1;
-                    mem_read = 1'b0;
                     alu_control = 4'b0000;
                     mem_size_bytes = 3'b100;
                 end
 
                 // sh
                 3'b001: begin
-                    mem_write = 1'b1;
-                    mem_read = 1'b0;
                     alu_control = 4'b0000;
                     mem_size_bytes = 3'b010;
                 end
 
                 // sb
                 3'b000: begin
-                    mem_write = 1'b1;
-                    mem_read = 1'b0;
                     alu_control = 4'b0000;
                     mem_size_bytes = 3'b001;
                 end
@@ -282,7 +242,6 @@ always @(*) begin
         7'b1100011: begin
             
             // alu_src is false because we need to compare rs1 and rs2
-            alu_src = 1'b0;
             // b-type
             imm_type = 3'b010;
             // branch = 1'b1;
@@ -336,10 +295,8 @@ always @(*) begin
         end
 
         7'b1101111: begin
-            alu_src = 1'b0;
             // j-type
             imm_type = 3'b100;
-            reg_write = 1'b1;
 
             // JAL is the only j-type instruction
 
@@ -352,10 +309,8 @@ always @(*) begin
 
         // JALR
         7'b1100111: begin
-            alu_src = 1'b1;
             // i-type
             imm_type = 3'b000;
-            reg_write = 1'b1;
 
             alu_control = 4'b0000;
             jalr = 1'b1;
@@ -363,10 +318,8 @@ always @(*) begin
 
         // AUIPC
         7'b0010111: begin
-            alu_src = 1'b1;
             // u-type
             imm_type = 3'b011;
-            reg_write = 1'b1;
             
             // addition doesnt do anything;
             alu_control = 4'b0000;
@@ -375,10 +328,8 @@ always @(*) begin
 
         // LUI
         7'b0110111: begin
-            alu_src = 1'b1;
             // u-type
             imm_type = 3'b011;
-            reg_write = 1'b1;
 
             alu_control = 4'b0000;
             lui = 1'b1;
@@ -387,8 +338,6 @@ always @(*) begin
 
         default: begin
             alu_control = 4'b0000;
-            reg_write = 1'b0;
-            alu_src = 1'b0;
             imm_type = 3'b000;
 
         end

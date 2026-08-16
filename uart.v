@@ -7,7 +7,7 @@ module uart(
     input uart_rx_read,
 
     output reg tx,
-    output reg [7:0] uart_rx_data,
+    output wire [7:0] uart_rx_data,
     output wire uart_rx_ready
 );
 
@@ -24,9 +24,11 @@ wire uart_tx_fifo_empty;
 assign uart_tx_fifo_empty = uart_tx_fifo_front == uart_tx_fifo_back;
 
 reg recieving = 0;
+reg [7:0] rx_current_data;
 reg [2:0] rx_clock_count = 0;
 reg [2:0] rx_state = 0;
 reg [3:0] rx_bit_index = 0;
+reg [7:0] rx_data_reg;
 
 reg [7:0] uart_rx_fifo [0:7];
 reg [2:0] uart_rx_fifo_front = 0;
@@ -34,13 +36,16 @@ reg [2:0] uart_rx_fifo_back = 0;
 wire uart_rx_fifo_empty;
 assign uart_rx_fifo_empty = uart_rx_fifo_front == uart_rx_fifo_back;
 
+// assign uart_rx_data = uart_rx_fifo[uart_rx_fifo_front];
+assign uart_rx_data = rx_data_reg;
+
 assign uart_rx_ready = !uart_rx_fifo_empty;
 
 
 always @(posedge clk) begin
-
     if (uart_rx_read) begin
-        uart_rx_data <= uart_rx_fifo[uart_rx_fifo_front];
+        rx_data_reg <= uart_rx_fifo[uart_rx_fifo_front];
+
         if (uart_rx_fifo_front == 7 )
             uart_rx_fifo_front <= 0;
         else
@@ -67,7 +72,7 @@ always @(posedge clk) begin
         rx_state <= 0;
         rx_bit_index <= 0;
         recieving <= 0;
-        uart_rx_data <= 0;
+        rx_data_reg <= 0;
         uart_rx_fifo_back <= 0;
         uart_rx_fifo_front <= 0;
         uart_tx_fifo_back <= 0;
@@ -125,7 +130,7 @@ always @(posedge clk) begin
 
             2: begin
                 if (rx_clock_count == 3'b100) begin
-                    uart_rx_data[rx_bit_index] <= rx;
+                    rx_current_data[rx_bit_index] <= rx;
                     if (rx_bit_index == 7) begin
                         rx_state <= 3;
                     end
@@ -139,7 +144,7 @@ always @(posedge clk) begin
             3: begin
                 if (rx_clock_count == 3'b100) begin
                     if (rx) begin
-                        uart_rx_fifo[uart_rx_fifo_back] = uart_rx_data;
+                        uart_rx_fifo[uart_rx_fifo_back] <= rx_current_data;
                         if (uart_rx_fifo_back == 7 )
                             uart_rx_fifo_back <= 0;
                         else

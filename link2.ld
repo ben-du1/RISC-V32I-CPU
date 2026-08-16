@@ -7,7 +7,7 @@ SECTIONS
         *(.text*)
     }
 
-    .data ALIGN(4) :
+    .data 0x00000200 :
     {
         *(.data*)
         *(.sdata*)
@@ -21,8 +21,6 @@ SECTIONS
         *(COMMON)
         _bss_end = .;
     }
-
-    . = ALIGN(4);
 
     _stack_top = 0x00000400;
 }

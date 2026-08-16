@@ -40,8 +40,8 @@ task send_uart_byte;
     integer j;
 
     begin
-        // rx = 1'b1;
-        // repeat(5) @(posedge clk);
+        rx = 1'b1;
+        repeat(5) @(posedge clk);
 
         rx = 1'b0;
         repeat(5) @(posedge clk);
@@ -67,16 +67,16 @@ initial begin
     clk = 0;
     reset = 1;
 
-    #25;
+    #100;
 
     reset = 0;
-    // send_uart_byte(8'hD0);
-    // send_uart_byte(8'h41);
-    // send_uart_byte(8'h67);
+    send_uart_byte(8'hD0);
+    send_uart_byte(8'h41);
+    send_uart_byte(8'h67);
 
-    gpio_in = 1'b1;
+    // gpio_in = 1'b1;
 
-    #8000;
+    #10000;
 
     $finish;
 end

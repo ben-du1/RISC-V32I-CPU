@@ -6,17 +6,17 @@ Write-Host "=== Assembling ==="
     -march=rv32i `
     -mabi=ilp32 `
     -c program.s `
-    -o program.o
+    -o _program.elf
 
-& riscv64-unknown-elf-objdump -d program.o
+& riscv64-unknown-elf-objdump -d _program.elf
 
 Write-Host "=== Generating Binary ==="
 
-& riscv64-unknown-elf-objcopy -O binary -j .text program.o program.bin
+& riscv64-unknown-elf-objcopy -O binary -j .text _program.elf _program.bin
 
 Write-Host "=== Running Python conversion ==="
 
-python convert.py
+python convert.py hex _program.bin _program.hex
 
 Write-Host "=== Compiling Verilog ==="
 

@@ -3,7 +3,7 @@
 #define UART_STATUS (*(volatile unsigned char*)0x10000014)
 #define GPIO_IN (*(volatile unsigned char*)0x1000001c)
 #define GPIO_OUT (*(volatile unsigned char*)0x10000020)
-#define TIMER_COUNT (*(volatile unsigned char*)0x10000024)
+#define TIMER_COUNT (*(volatile unsigned int*)0x10000024)
 
 
 // void put_char(char c) {
@@ -43,10 +43,24 @@ void main() {
 
     // GPIO_OUT = 0;
     while (1) {
+        // char c = get_char();
+        // put_char(c);
         GPIO_OUT = 1;
         delay(27000000);
 
         GPIO_OUT = 0;
         delay(27000000);
+
+        GPIO_OUT = 1;
+        delay(27000000*2);
+
+        GPIO_OUT = 0;
+        delay(27000000*2);
+
+        GPIO_OUT = 1;
+        delay(27000000*4);
+
+        GPIO_OUT = 0;
+        delay(27000000*4);
     }
 }
