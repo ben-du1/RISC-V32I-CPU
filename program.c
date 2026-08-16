@@ -6,16 +6,16 @@
 #define TIMER_COUNT (*(volatile unsigned int*)0x10000024)
 
 
-// void put_char(char c) {
-//     UART_TX = c;
-// }
+void put_char(char c) {
+    UART_TX = c;
+}
 
-// char get_char() {
-//     while (!UART_STATUS){
+char get_char() {
+    while (!UART_STATUS){
 
-//     }
-//     return UART_RX;
-// }
+    }
+    return UART_RX;
+}
 
 void delay(unsigned int cycles)
 {
@@ -43,24 +43,24 @@ void main() {
 
     // GPIO_OUT = 0;
     while (1) {
-        // char c = get_char();
-        // put_char(c);
-        GPIO_OUT = 1;
-        delay(27000000);
+        char c = get_char();
+        put_char(c);
+        // GPIO_OUT = 1;
+        // delay(27000000);
 
-        GPIO_OUT = 0;
-        delay(27000000);
+        // GPIO_OUT = 0;
+        // delay(27000000);
 
-        GPIO_OUT = 1;
-        delay(27000000*2);
+        // GPIO_OUT = 1;
+        // delay(27000000*2);
 
-        GPIO_OUT = 0;
-        delay(27000000*2);
+        // GPIO_OUT = 0;
+        // delay(27000000*2);
 
-        GPIO_OUT = 1;
-        delay(27000000*4);
+        // GPIO_OUT = 1;
+        // delay(27000000*4);
 
-        GPIO_OUT = 0;
-        delay(27000000*4);
+        // GPIO_OUT = 0;
+        // delay(27000000*4);
     }
 }

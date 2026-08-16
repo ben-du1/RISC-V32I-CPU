@@ -27,6 +27,7 @@ module controller(
     output reg mdr_write,
     output reg reg_write,
     output reg mem_read,
+    output reg mem_format,
     output reg mem_write,
     output reg alu_src_imm,
     output reg [1:0] alu_src_a,
@@ -137,15 +138,20 @@ always @(*) begin
 
         MEM_ADDRESS: begin
 
-            if (opcode == OP_LOAD)
-                next_state = MEM_READ;
-            else
-                next_state = MEM_WRITE;
+            // if (opcode == OP_LOAD)
+            //     next_state = MEM_READ;
+            // else
+            //     next_state = MEM_WRITE;
+            next_state = MEM_READ;
 
         end
 
         MEM_READ:
-            next_state = MEM_WAIT;
+            // next_state = MEM_WAIT;
+            if (opcode == OP_LOAD)
+                next_state = MEM_WAIT;
+            else
+                next_state = MEM_WRITE;
 
         MEM_WAIT:
             next_state = MEM_WB;
@@ -190,6 +196,7 @@ always @(*) begin
     alu_out_write  = 1'b0;
     mdr_write      = 1'b0;
     reg_write      = 1'b0;
+    mem_format = 1'b0;
     mem_read       = 1'b0;
     mem_write      = 1'b0;
     alu_src_imm    = 1'b0;
@@ -204,7 +211,7 @@ always @(*) begin
 
             pc_write = 1'b1;
 
-            alu_src_a = 2'b00;
+            // alu_src_a = 2'b00;
 
         end
 
@@ -270,7 +277,7 @@ always @(*) begin
 
         MEM_WAIT: begin
 
-            mem_read = 1'b1;
+            mem_format = 1'b1;
             mdr_write = 1'b1;
 
         end
