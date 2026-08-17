@@ -1,0 +1,53 @@
+// Tang Nano 20K
+// Device: GW2AR-LV18QN88C8/I7
+
+// Clock
+IO_LOC "clk" 4;
+IO_PORT "clk" IO_TYPE=LVCMOS33;
+
+// Reset
+IO_LOC "reset" 75;
+IO_PORT "reset" IO_TYPE=LVCMOS33;
+
+// UART connected to onboard BL616
+// FPGA pin 70 = BL616 UART TX -> FPGA RX
+// FPGA pin 69 = FPGA TX -> BL616 UART RX
+IO_LOC "rx" 74;
+IO_PORT "rx" IO_TYPE=LVCMOS33;
+
+IO_LOC "tx" 73;
+IO_PORT "tx" IO_TYPE=LVCMOS33;
+
+
+// GPIO OUT
+IO_LOC "gpio_out[0]" 15;
+IO_LOC "gpio_out[1]" 16;
+IO_LOC "gpio_out[2]" 17;
+IO_LOC "gpio_out[3]" 18;
+IO_LOC "gpio_out[4]" 19;
+IO_LOC "gpio_out[5]" 20;
+
+
+IO_PORT "gpio_out[0]" IO_TYPE=LVCMOS33;
+IO_PORT "gpio_out[1]" IO_TYPE=LVCMOS33;
+IO_PORT "gpio_out[2]" IO_TYPE=LVCMOS33;
+IO_PORT "gpio_out[3]" IO_TYPE=LVCMOS33;
+IO_PORT "gpio_out[4]" IO_TYPE=LVCMOS33;
+IO_PORT "gpio_out[5]" IO_TYPE=LVCMOS33;
+
+
+// GPIO IN
+IO_LOC "gpio_in[0]" 25;
+IO_LOC "gpio_in[1]" 26;
+IO_LOC "gpio_in[2]" 27;
+IO_LOC "gpio_in[3]" 28;
+IO_LOC "gpio_in[4]" 29;
+IO_LOC "gpio_in[5]" 30;
+
+
+IO_PORT "gpio_in[0]" IO_TYPE=LVCMOS33;
+IO_PORT "gpio_in[1]" IO_TYPE=LVCMOS33;
+IO_PORT "gpio_in[2]" IO_TYPE=LVCMOS33;
+IO_PORT "gpio_in[3]" IO_TYPE=LVCMOS33;
+IO_PORT "gpio_in[4]" IO_TYPE=LVCMOS33;
+IO_PORT "gpio_in[5]" IO_TYPE=LVCMOS33;
