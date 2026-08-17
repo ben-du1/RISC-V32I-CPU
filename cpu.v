@@ -164,6 +164,8 @@ datapath datapath_unit (
     .memory_address(memory_address),
     .memory_write_data(memory_write_data),
 
+    .instruction_read(instruction_read),
+
     .alu_result(alu_result),
     .alu_zero(alu_zero),
 
@@ -176,6 +178,8 @@ data_memory data_memory_unit (
 
     .mem_write(mem_write),
     .mem_read(mem_read),
+    
+    .ir_write(ir_write),
     .instruction_read(instruction_read),
 
 

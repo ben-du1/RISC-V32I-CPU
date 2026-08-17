@@ -6,6 +6,7 @@ module data_memory(
     input mem_read,
 
     input instruction_read,
+    input ir_write,
 
     input [2:0] mem_size_bytes,
     input mem_load_signed,
@@ -44,17 +45,21 @@ assign uart_rx_read = uart_rx_read_enable && (address == 32'h10000010);
 
 // synchronous reads during MEM_READ
 always @(posedge clk) begin
-    if (mem_read)
+    if (mem_read || instruction_read)
         memory_read_data <= memory[address[12:2]];
-    if (instruction_read)
-        instruction <= memory[instruction_address[12:2]];
+    // if (instruction_read)
+    //     instruction <= memory[instruction_address[12:2]];
 end
 
 // data formatting during MEM_WAIT
 always @(*) begin
 
+    if (ir_write) begin
+        read_data = memory_read_data;
+    end
+
     // if reading rx
-    if (address == 32'h10000010) begin
+    else if (address == 32'h10000010) begin
         read_data = {24'b0,uart_rx_data};
     end 
     
@@ -111,7 +116,7 @@ always @(*) begin
             end
 
             default:
-                read_data = 32'h0;
+                read_data = 32'b0;
 
         endcase
     end
@@ -132,6 +137,8 @@ always @(posedge clk) begin
     if (mem_write)  begin
         if (address == 32'h10000000) begin
             uart_tx_data <= write_data[7:0];
+            $display("%b",write_data[7:0]);
+
             uart_tx_start <= 1'b1;
         end else if (address == 32'h10000020) begin
             gpio_out <= write_data[15:0];

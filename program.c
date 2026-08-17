@@ -38,13 +38,40 @@ void gpio_write(int pin, int value)
 
 int gpio_read(int pin) { return (GPIO_IN >> pin) & 1; }
 
+int DELAY = 5;
+
 void main() {
-    int i = 0;
+    // int i = 0;
+    
+    // char c = get_char();
+    // put_char(c);
+
     while (1) {
-        delay(1);
-        gpio_write(i,1);
-        put_char(gpio_read(4));
-        put_char(test3);
-        i++;
+        // if (gpio_read(3)) {
+        //     gpio_write(0,1);
+        // } else {
+        //     gpio_write(0,0);
+        // }
+        // int j = gpio_read(4);
+        // put_char(j);
+        // put_char(test3);
+        // i++;
+        // for (int i = 0; i < 6; i++) {
+        //     delay(27000000);
+        //     gpio_read()
+        // }
+        // if (gpio_read(0)) { 
+        //     gpio_write(0,1);
+        // }
+        // gpio_write(0,0);
+
+        gpio_write(0,1);
+        delay(DELAY);
+        gpio_write(0,0);
+        delay(DELAY);
+        gpio_write(5,1);
+        delay(DELAY);
+        gpio_write(5,0);
+        delay(DELAY);
     }
 }

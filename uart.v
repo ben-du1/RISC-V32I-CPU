@@ -11,9 +11,9 @@ module uart(
     output wire uart_rx_ready
 );
 
-localparam BIT_CLK_CYCLES = 3'd5;
+localparam BIT_CLK_CYCLES = 9'd5;
 // we only sample once per bit for now
-localparam SAMPLE_DELAY = 3'd2;
+localparam SAMPLE_DELAY = 9'd2;
 
 localparam RX_START = 3'd1;
 localparam RX_READ = 3'd2;
@@ -30,7 +30,7 @@ localparam FIFO_LENGTH = 4'd8;
 localparam FIFO_END = FIFO_LENGTH - 1;
 
 reg transmitting;
-reg [2:0] tx_clock_count;
+reg [8:0] tx_clock_count;
 reg [3:0] tx_bit_index;
 reg [7:0] tx_current_data;
 reg [2:0] tx_state;
@@ -43,7 +43,7 @@ wire tx_fifo_empty;
 assign tx_fifo_empty = tx_fifo_front == tx_fifo_back;
 
 reg receiving;
-reg [2:0] rx_clock_count;
+reg [8:0] rx_clock_count;
 reg [3:0] rx_bit_index;
 reg [7:0] rx_current_data;
 reg [2:0] rx_state;
@@ -55,9 +55,9 @@ reg [2:0] rx_fifo_back;
 wire rx_fifo_empty;
 
 assign rx_fifo_empty = rx_fifo_front == rx_fifo_back;
-assign uart_rx_data = rx_data_reg;
 assign uart_rx_ready = !rx_fifo_empty;
-
+assign  uart_rx_data = rx_data_reg;
+assign  uart_rx_ready = !rx_fifo_empty;
 
 always @(posedge clk) begin
 
@@ -87,7 +87,7 @@ always @(posedge clk) begin
             if (rx_fifo_front == FIFO_END )
                 rx_fifo_front <= 0;
             else
-                rx_fifo_front <= rx_fifo_front + 1;
+                rx_fifo_front <= rx_fifo_front + 3'd1;
 
         end
 
@@ -96,7 +96,7 @@ always @(posedge clk) begin
             if (tx_fifo_back == FIFO_END )
                 tx_fifo_back <= 0;
             else
-                tx_fifo_back <= tx_fifo_back + 1;
+                tx_fifo_back <= tx_fifo_back + 3'd1;
         end
         
         if (!transmitting && !tx_fifo_empty) begin
@@ -106,14 +106,14 @@ always @(posedge clk) begin
                 if (tx_fifo_front == FIFO_END )
                     tx_fifo_front <= 0;
                 else
-                    tx_fifo_front <= tx_fifo_front + 1;
+                    tx_fifo_front <= tx_fifo_front + 3'd1;
 
                 tx_bit_index <= 0;
                 tx_clock_count <= 0;
                 tx_state <= TX_START;
 
         end else if (transmitting) begin
-            tx_clock_count <= tx_clock_count + 1;
+            tx_clock_count <= tx_clock_count + 9'd1;
             if (tx_clock_count == BIT_CLK_CYCLES - 1) begin
                 case (tx_state) 
                     TX_START: begin
@@ -124,9 +124,9 @@ always @(posedge clk) begin
                     TX_SEND: begin
                         if (tx_bit_index <= 7) begin
                             tx <= tx_current_data[tx_bit_index];
-                            tx_bit_index <= tx_bit_index + 1;
+                            tx_bit_index <= tx_bit_index + 3'd1;
                         end else
-                            tx_state = TX_STOP;
+                            tx_state <= TX_STOP;
                     end
 
                     TX_STOP: begin
@@ -164,7 +164,7 @@ always @(posedge clk) begin
                         rx_state <= RX_READ;
                         rx_clock_count <= 0;
                     end else begin
-                        rx_clock_count <= rx_clock_count + 1;
+                        rx_clock_count <= rx_clock_count + 9'd1;
                     end
                 end
 
@@ -175,9 +175,9 @@ always @(posedge clk) begin
                             rx_state <= RX_STOP;
                         end
                         rx_clock_count <= 0;
-                        rx_bit_index <= rx_bit_index  + 1;
+                        rx_bit_index <= rx_bit_index  + 3'd1;
                     end else begin
-                        rx_clock_count <= rx_clock_count + 1;
+                        rx_clock_count <= rx_clock_count + 9'd1;
                     end
                 end
 
@@ -188,12 +188,12 @@ always @(posedge clk) begin
                             if (rx_fifo_back == 7 )
                                 rx_fifo_back <= 0;
                             else
-                                rx_fifo_back <= rx_fifo_back + 1;
+                                rx_fifo_back <= rx_fifo_back + 3'd1;
                         end
                         receiving <= 0;
 
                     end else begin
-                        rx_clock_count <= rx_clock_count + 1;
+                        rx_clock_count <= rx_clock_count + 9'd1;
                     end
                 end
             endcase

@@ -3,6 +3,10 @@ module cpu_tb;
     reg clk;
     reg reset;
     reg uart_rx;
+    reg uart_tx;
+
+    reg [15:0] gpio_in;
+    reg [15:0] gpio_out;
 
     reg [7:0] test_program [0:1023];
 
@@ -10,7 +14,10 @@ module cpu_tb;
     cpu uut (
         .clk(clk),
         .reset(reset),
-        .rx(uart_rx)
+        .rx(uart_rx),
+        .tx(uart_tx),
+        .gpio_in(gpio_in),
+        .gpio_out(gpio_out)
     );
 
     always #5 clk = ~clk;
@@ -56,6 +63,29 @@ module cpu_tb;
         end
     endtask
 
+    task uart_receive_byte;
+        reg [7:0] data;
+        integer i;
+        begin
+            // Wait for start bit
+            @(negedge uart_tx);
+
+            // Halfway through start bit
+            repeat (2) @(posedge clk);
+
+            // Data bits
+            for (i = 0; i < 8; i = i + 1) begin
+                repeat (5) @(posedge clk);
+                data[i] = uart_tx;
+            end
+
+            // Stop bit
+            repeat (5) @(posedge clk);
+
+            $display("CPU UART TX: 0x%02X, %b", data, data);
+        end
+    endtask
+
     initial begin
         $dumpfile("cpu.vcd");
         $dumpvars(0,cpu_tb);
@@ -71,9 +101,21 @@ module cpu_tb;
         send_program(700);
 
         // wait for application
+        // gpio_in = 16'b0;
+        // gpio_in[4] = 1'b1;
+        // #10;
+        // uart_send_byte(8'h67);
+        // uart_receive_byte();
         #100000;
 
         $finish;
     end
+
+
+initial begin
+    forever begin
+        uart_receive_byte();
+    end
+end
 
 endmodule

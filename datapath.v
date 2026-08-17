@@ -20,6 +20,8 @@ module datapath (
     input [31:0] instruction_memory_data,
     input [31:0] data_memory_data,
 
+    input instruction_read,
+
     output [31:0] ir_data,
     output [31:0] memory_address,
     output [31:0] memory_write_data,
@@ -110,7 +112,8 @@ always @(posedge clk) begin
         old_pc <= 32'b0;
     end else begin 
         if (ir_write) begin
-            ir <= instruction_memory_data;
+            // ir <= instruction_memory_data;
+            ir <= data_memory_data;
             old_pc <= pc_reg;
         end
         if (a_write)
@@ -163,7 +166,7 @@ alu alu_unit(
     .zero(alu_zero)
 );
 
-assign memory_address = alu_out;
+assign memory_address = instruction_read ? pc_reg : alu_out;
 assign memory_write_data = B;
 
 
