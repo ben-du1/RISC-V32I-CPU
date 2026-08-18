@@ -1,6 +1,6 @@
 # RISCV32I CPU
 <img width="1066" height="926" alt="ezgif-2f79013a669eb8ac" src="https://github.com/user-attachments/assets/fb0fa088-e58a-46dc-a757-89b07d0899e2" />
-*Tang Nano 20K with ESP32 Programmer running `/program/program.c`*
+*Tang Nano 20K with ESP32 Programmer running* `/program/program.c`
 
 ## Overview
 This is a Verilog-based soft-core CPU that I developed which executes the RISCV32I instruction set. If you plan on testing this chip on an FPGA, make sure to read the "FPGA Implementation" section.
