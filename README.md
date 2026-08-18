@@ -1,13 +1,12 @@
 # RISCV32I CPU
-<img width="1066" height="926" alt="ezgif-2f79013a669eb8ac" src="https://github.com/user-attachments/assets/fb0fa088-e58a-46dc-a757-89b07d0899e2" />
-
+![](https://github.com/user-attachments/assets/fb0fa088-e58a-46dc-a757-89b07d0899e2)
 *Tang Nano 20K with ESP32 Programmer running* `/program/program.c`
 
 ## Overview
 This is a Verilog-based soft-core CPU that I developed which executes the RISCV32I instruction set. If you plan on testing this chip on an FPGA, make sure to read the "FPGA Implementation" section.
 
 ## Architecture
-<img width="960" height="540" alt="cpu_architecture_diagram" src="https://github.com/user-attachments/assets/9500de31-34a0-47e9-af45-61bdc0997473" />
+![Architecture diagram](https://github.com/user-attachments/assets/9500de31-34a0-47e9-af45-61bdc0997473)
 
 The CPU features a Von Neumann architecture with programs and data being stored in a unified memory. The CPU is multicycle to accommodate synchronous read and write to memory, which is crucial for proper BSRAM inference during synthesis.
 
