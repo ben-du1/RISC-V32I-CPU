@@ -38,18 +38,20 @@ void gpio_write(int pin, int value)
 
 int gpio_read(int pin) { return (GPIO_IN >> pin) & 1; }
 
-int DELAY = 5;
+int DELAY = 13500000;
 
 void main() {
 
     while (1) {
-        gpio_write(0,1);
-        delay(DELAY);
-        gpio_write(0,0);
-        delay(DELAY);
-        gpio_write(5,1);
-        delay(DELAY);
-        gpio_write(5,0);
-        delay(DELAY);
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                if (j != i) {
+                    gpio_write(j,1);
+                } else {
+                    gpio_write(j,0);
+                }
+            }
+            delay(DELAY);
+        }
     }
 }
